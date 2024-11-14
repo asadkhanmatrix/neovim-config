@@ -1,14 +1,8 @@
 -- lua/plugins/init.lua
 return {
     -- Color scheme
-    {
-        "folke/tokyonight.nvim",
-        lazy = false,
-        priority = 1000,
-        config = function()
-            vim.cmd([[colorscheme tokyonight]])
-        end,
-    },
+    { "bluz71/vim-nightfly-colors", name = "nightfly", lazy = false, priority = 1000, config = function() vim.cmd([[colorscheme nightfly]]) end, },
+    --{ "folke/tokyonight.nvim", lazy = false, priority = 1000, config = function() vim.cmd([[colorscheme tokyonight]]) end, },
 
     -- LSP Support
     {
@@ -36,6 +30,8 @@ return {
                 ensure_installed = {
                     "clangd",
                     "pyright",
+                    "rust_analyzer",
+                    "zls",
                 },
                 automatic_installation = true,
             })
@@ -61,7 +57,7 @@ return {
         build = ":TSUpdate",
         config = function()
             require("nvim-treesitter.configs").setup({
-                ensure_installed = { "c", "cpp", "python", "lua", "vim" },
+                ensure_installed = { "c", "cpp", "python", "lua", "vim", "rust", "zig" },
                 highlight = { enable = true },
                 indent = { enable = true },
             })
