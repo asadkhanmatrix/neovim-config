@@ -1,0 +1,128 @@
+-- init.lua
+
+-- Clipboard support
+vim.o.clipboard = 'unnamedplus'         -- Use system clipboard for all operations
+
+-- General Settings
+vim.cmd('syntax enable')                -- Enable syntax highlighting
+vim.o.hidden = true                     -- Enable modified buffers in background
+vim.o.mouse = 'a'                       -- Enable mouse support
+
+-- Appearance
+--vim.o.termguicolors = true              -- True color support
+--vim.o.background = 'dark'               -- Dark background for colorschemes
+--vim.cmd('colorscheme default')    	  -- Set colorscheme (change 'gruvbox' to your preferred colorscheme)
+
+-- Indentation
+--vim.o.tabstop = 4                       -- Number of spaces tabs count for
+--vim.o.shiftwidth = 4                    -- Number of spaces to use for autoindent
+--vim.o.expandtab = true                  -- Use spaces instead of tabs
+
+-- Search
+vim.o.ignorecase = true                 -- Case insensitive search
+vim.o.smartcase = true                  -- Case-sensitive if including uppercase
+
+-- Line numbers
+vim.wo.number = true                    -- Show line numbers
+vim.wo.relativenumber = true            -- Relative line numbers
+
+-- Backup and Undo
+vim.o.backup = false                    -- Disable backup files
+vim.o.swapfile = false                  -- Disable swap files
+vim.cmd('set undodir=~/.vim/undodir')   -- Directory to store undo files
+vim.o.undofile = true                   -- Enable persistent undo
+
+-- Automatically change directory
+vim.o.autochdir = true                  -- Automatically change directory
+
+-- Key mappings
+vim.api.nvim_set_keymap('n', 'gr', [[:execute 'grep -rn ' . expand('<cword>') . ' --include=*.{h,hpp,c,cpp} ~/projects/Development/1.5.1/'<CR>:copen<CR>]], { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', 'j', 'gj', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', 'k', 'gk', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<Esc>', ':nohlsearch<CR>', { noremap = true, silent = true }) 
+vim.api.nvim_set_keymap('n', '<Leader>q', 'ZZ<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<Leader>ee', ':Explore<CR>:silent! vertical resize 80<CR>', { noremap = true, silent = true })  -- Open a vertical Explore window
+vim.api.nvim_set_keymap('n', '<A-S-k>', ':move -2<CR>', { noremap = true, silent = true }) -- Move line up
+vim.api.nvim_set_keymap('n', '<A-S-j>', ':move +1<CR>', { noremap = true, silent = true }) -- Move line down
+vim.api.nvim_set_keymap('n', '<Leader>z', [[:lua vim.fn.setreg('/', '\\V\\<' .. vim.fn.escape(vim.fn.expand('<cword>'), '\\') .. '\\>')<CR>:set hlsearch<CR>]], { noremap = true, silent = true })
+vim.api.nvim_set_keymap('i', '<A-S-k>', '<C-o>:move -2<CR>', { noremap = true, silent = true }) -- Move line up
+vim.api.nvim_set_keymap('i', '<A-S-j>', '<C-o>:move +1<CR>', { noremap = true, silent = true }) -- Move line down
+vim.api.nvim_set_keymap('i', 'jk', '<Esc>', { noremap = true })
+vim.api.nvim_set_keymap('i', '{<CR>', '{<CR>}<Esc>O', { noremap = true })
+
+-- Vim Style Key mappings
+
+-- Plugins (using packer.nvim as an example plugin manager)
+-- require('plugins')                      -- Load plugin configurations
+
+-- Auto commands
+vim.cmd('autocmd BufWritePost init.lua source %')  -- Automatically reload init.lua when saved
+
+-- Language-specific settings
+-- Python
+vim.cmd([[autocmd FileType python setlocal expandtab tabstop=4 shiftwidth=4]])
+
+-- Execute current Python file
+local function execute_python3()
+    local file_path = vim.fn.expand('%:p')  -- Get the full path of the current file
+    local execute_command = 'vnew | terminal time python3 ' .. file_path
+    vim.cmd(':w')  -- Write the file to disk
+    vim.cmd(execute_command)  -- Execute the command to run the Python file
+    vim.cmd(':silent! vertical resize 80')  -- Resize the terminal window
+end
+
+-- Define an autocmd group for Python files
+vim.api.nvim_create_augroup('PythonMappings', { clear = true })
+
+-- Apply the mappings only to Python files
+vim.api.nvim_create_autocmd('FileType', {
+  group = 'PythonMappings',
+  pattern = 'python',
+  callback = function()
+    vim.api.nvim_set_keymap('n', '<Leader>ds', '', { noremap = true, silent = true, callback = function() execute_python3() end })  -- Executes Code
+  end
+})
+
+-- cpp
+-- vim.cmd([[autocmd FileType cpp setlocal expandtab tabstop=2 shiftwidth=2]])
+
+-- Define the commands as functions
+local function compile_cpp()
+  local compile_command = 'vnew | terminal time g++ -std=c++23 -O2 -Wall -Wpedantic -fsanitize=address -fsanitize=undefined ' .. vim.fn.expand('%:p:.') .. ' -o ' .. vim.fn.expand('%:r')
+  vim.cmd(':w')
+  vim.cmd(compile_command)
+  vim.cmd(':silent! vertical resize 80')
+end
+
+local function execute_cpp()
+  local execute_command = 'vsplit | terminal ' .. vim.fn.expand('%:p:r')
+  vim.cmd(':w')
+  vim.cmd(execute_command)
+end
+
+-- local function execute_cpp()
+--   local execute_command = 'vnew | terminal time ' .. vim.fn.expand('%:p:r')
+--   vim.cmd(':w')
+--   vim.cmd(execute_command)
+--   vim.cmd(':silent! vertical resize 80')
+-- end
+
+-- Define an autocmd group for C++ files
+vim.api.nvim_create_augroup('CppMappings', { clear = true })
+
+-- Apply the mappings only to C++ files
+vim.api.nvim_create_autocmd('FileType', {
+  group = 'CppMappings',
+  pattern = 'cpp',
+  callback = function()
+    vim.api.nvim_set_keymap('n', '<Leader>bs', '', { noremap = true, silent = true, callback = compile_cpp })  -- Compiles Code
+    vim.api.nvim_set_keymap('n', '<Leader>ds', '', { noremap = true, silent = true, callback = execute_cpp })  -- Executes Code
+  end
+})
+
+-- Autosave on any change to the buffer
+vim.api.nvim_exec([[
+    autocmd InsertLeave,TextChanged * silent! w
+]], false)
+
+require("config.lazy")
