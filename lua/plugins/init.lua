@@ -117,5 +117,10 @@ return {
 
     {
         "jose-elias-alvarez/null-ls.nvim",
-    }
+    },
+
+    {
+        "kmontocam/nvim-conda",
+        dependencies = { "nvim-lua/plenary.nvim" },
+    },
 }
