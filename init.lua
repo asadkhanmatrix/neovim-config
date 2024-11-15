@@ -173,5 +173,23 @@ vim.api.nvim_create_autocmd({ "InsertLeave", "TextChanged" }, {
     command = "silent! write",
 })
 
+if vim.g.neovide then
+    vim.o.guifont = "JetBrainsMono Nerd Font:h11"
+
+    vim.opt.linespace = 0
+
+    vim.g.neovide_scale_factor = 1.0
+
+    --padding
+    vim.g.neovide_padding_top = 0
+    vim.g.neovide_padding_bottom = 0
+    vim.g.neovide_padding_right = 0
+    vim.g.neovide_padding_left = 0
+
+    vim.g.neovide_window_blurred = true
+
+    vim.g.neovide_cursor_antialiasing = true
+end
+
 -- Load plugin manager and configurations
 require("config.lazy")
