@@ -1,7 +1,8 @@
 -- lua/plugins/init.lua
 return {
     -- Color scheme
-    { "bluz71/vim-nightfly-colors", name = "nightfly", lazy = false, priority = 1000, config = function() vim.cmd([[colorscheme nightfly]]) end, },
+    { "catppuccin/nvim", name = "catppuccin", lazy = false, priority = 1000, config = function() vim.cmd([[colorscheme catppuccin]]) end, },
+    --{ "bluz71/vim-nightfly-colors", name = "nightfly", lazy = false, priority = 1000, config = function() vim.cmd([[colorscheme nightfly]]) end, },
     --{ "folke/tokyonight.nvim", lazy = false, priority = 1000, config = function() vim.cmd([[colorscheme tokyonight]]) end, },
 
     -- LSP Support
