@@ -30,6 +30,12 @@ map("n", "<Esc>", ":nohlsearch<CR>", opts)
 map("n", "<leader>q", "ZZ", opts)
 map("n", "<leader>ee", ":Explore<CR>:vertical resize 80<CR>", opts)
 
+-- Open terminal
+map("n", "<leader>t", function()
+    vim.cmd("vnew | terminal ")
+    vim.cmd("vertical resize 80")
+end, opts)
+
 -- Line movement
 map({ "n", "i" }, "<A-S-k>", function() vim.cmd("move -2") end, opts)
 map({ "n", "i" }, "<A-S-j>", function() vim.cmd("move +1") end, opts)
