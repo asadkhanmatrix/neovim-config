@@ -11,7 +11,7 @@ return {
         local util = require("lspconfig.util")
 
         -- Enable debug logging for LSP
-        vim.lsp.set_log_level("debug")
+        vim.lsp.set_log_level("warn")
 
         -- LSP setups
         lspconfig.clangd.setup({
@@ -25,8 +25,10 @@ return {
                 "--function-arg-placeholders",
                 "--fallback-style=llvm",
                 "--suggest-missing-includes",
+                "--compile-commands-dir=build",  -- Explicitly point to build directory
+                "--query-driver=/usr/bin/c++",   -- Match your compiler
             },
-            filetypes = { "c", "cpp", "objc", "objcpp" },
+            filetypes = { "c", "cpp", "objc", "objcpp", "cuda" },
             root_dir = function(fname)
                 return util.root_pattern(
                     "compile_commands.json",
@@ -116,15 +118,15 @@ return {
             on_attach = function(client, bufnr)
                 -- Enable document formatting if supported
                 if client.server_capabilities.documentFormattingProvider then
-                    vim.api.nvim_buf_create_user_command(bufnr, "Format", 
+                    vim.api.nvim_buf_create_user_command(bufnr, "Format",
                         function() vim.lsp.buf.format({ async = true }) end,
                         { desc = "Format current buffer with LSP" }
                     )
                 end
 
-                -- Enable inlay hints if supported
+                -- Disable inlay hints by default
                 if client.server_capabilities.inlayHintProvider then
-                    vim.lsp.inlay_hint.enable(true)
+                    vim.lsp.inlay_hint.enable(false)
                 end
             end,
         })
@@ -148,7 +150,8 @@ return {
         vim.keymap.set("n", "<leader>D", vim.lsp.buf.type_definition, { desc = "Type definition" })
         vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, { desc = "Rename" })
         vim.keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, { desc = "Code action" })
-        vim.keymap.set("n", "<leader>cf", function() require("telescope.builtin").lsp_code_actions() end, { desc = "Code action (Telescope)" })
+        vim.keymap.set("n", "<leader>cf", function() require("telescope.builtin").lsp_code_actions() end,
+            { desc = "Code action (Telescope)" })
         vim.keymap.set("n", "gr", vim.lsp.buf.references, { desc = "Go to references" })
         vim.keymap.set("n", "<leader>f", function()
             vim.lsp.buf.format({ async = true })

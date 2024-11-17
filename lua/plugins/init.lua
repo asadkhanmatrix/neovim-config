@@ -1,7 +1,8 @@
 -- lua/plugins/init.lua
 return {
     -- Color scheme
-    { "catppuccin/nvim", name = "catppuccin", lazy = false, priority = 1000, config = function() vim.cmd([[colorscheme catppuccin]]) end, },
+    { "Shatur/neovim-ayu", name = "ayu", lazy = false, priority = 1000, config = function() vim.cmd([[colorscheme ayu]]) end, },
+    --{ "catppuccin/nvim", name = "catppuccin", lazy = false, priority = 1000, config = function() vim.cmd([[colorscheme catppuccin]]) end, },
     --{ "bluz71/vim-nightfly-colors", name = "nightfly", lazy = false, priority = 1000, config = function() vim.cmd([[colorscheme nightfly]]) end, },
     --{ "folke/tokyonight.nvim", lazy = false, priority = 1000, config = function() vim.cmd([[colorscheme tokyonight]]) end, },
 
@@ -58,7 +59,17 @@ return {
         build = ":TSUpdate",
         config = function()
             require("nvim-treesitter.configs").setup({
-                ensure_installed = { "c", "cpp", "python", "lua", "vim", "rust", "zig" },
+                ensure_installed = {
+                    "c",
+                    "cpp",
+                    "python",
+                    "lua",
+                    "vim",
+                    "rust",
+                    "zig",
+                    "markdown",
+                    "markdown_inline",
+                },
                 highlight = { enable = true },
                 indent = { enable = true },
             })
@@ -70,7 +81,7 @@ return {
         "tpope/vim-fugitive",
         config = function()
             -- Example Neovim Lua configuration for Fugitive key mappings
-            vim.api.nvim_set_keymap('n', '<Leader>gs', ':G status<CR>', { noremap = true, silent = true })  -- Git status
+            vim.api.nvim_set_keymap('n', '<Leader>gs', ':G<CR>', { noremap = true, silent = true })  -- Git status
             vim.api.nvim_set_keymap('n', '<Leader>gd', ':G diff<CR>', { noremap = true, silent = true })    -- Git diff
             vim.api.nvim_set_keymap('n', '<Leader>gc', ':G commit<CR>', { noremap = true, silent = true })  -- Git commit
             vim.api.nvim_set_keymap('n', '<Leader>gp', ':G push<CR>', { noremap = true, silent = true })    -- Git push
@@ -122,5 +133,49 @@ return {
     {
         "kmontocam/nvim-conda",
         dependencies = { "nvim-lua/plenary.nvim" },
+    },
+
+    -- Debugger
+    {
+        "mfussenegger/nvim-dap",
+    },
+
+    {
+        "jay-babu/mason-nvim-dap.nvim",
+        event = "VeryLazy",
+        dependencies = {
+            "williamboman/mason.nvim",
+            "mfussenegger/nvim-dap",
+        },
+        opts = {
+            handlers = {},
+        },
+    },
+
+    {
+        "rcarriga/nvim-dap-ui",
+        dependencies = {
+            "mfussenegger/nvim-dap",
+            "nvim-neotest/nvim-nio",
+        },
+        event = "VeryLazy",
+        config = function()
+            local dap = require("dap")
+            local dapui = require("dapui")
+            dapui.setup()
+            dap.listeners.after.event_initialized["dapui_config"] = function()
+                dapui.open()
+            end
+            dap.listeners.after.event_terminated["dapui_config"] = function()
+                dapui.close()
+            end
+            dap.listeners.after.event_exited["dapui_config"] = function()
+                dapui.close()
+            end
+
+            -- Key mappings
+            vim.api.nvim_set_keymap('n', '<Leader>dd', ':DapToggleBreakpoint<CR>', { noremap = true, silent = true, desc = "Add/Remove breakpoint at line" })
+            vim.api.nvim_set_keymap('n', '<Leader>dr', ':DapContinue<CR>', { noremap = true, silent = true, desc = "Start or continue the debugger" })
+        end
     },
 }
