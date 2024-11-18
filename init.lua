@@ -59,7 +59,7 @@ vim.api.nvim_create_autocmd({ "InsertLeave", "TextChanged" }, {
 })
 
 if vim.g.neovide then
-    vim.o.guifont = "JetBrainsMono Nerd Font:h14"
+    vim.o.guifont = "JetBrainsMono Nerd Font:h12"
 
     vim.opt.linespace = 0
 
@@ -75,6 +75,10 @@ if vim.g.neovide then
 
     vim.g.neovide_cursor_antialiasing = true
 end
+
+-- Diagnostic related
+map("n", "<leader>dn", function() vim.diagnostic.goto_next() end, {  noremap = true, silent = true, desc = "Goto next diagnostic" })
+map("n", "<leader>dp", function() vim.diagnostic.goto_prev() end, {  noremap = true, silent = true, desc = "Goto prev diagnostic" })
 
 -- Load plugin manager and configurations
 require("config.code_execution")
