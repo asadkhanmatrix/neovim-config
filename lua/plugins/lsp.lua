@@ -41,7 +41,6 @@ return {
             init_options = {
                 compilationDatabasePath = "build",
                 fallbackFlags = {
-                    "-std=c++23",
                     "-I/usr/include",
                     "-I/usr/local/include",
                     "-I" .. vim.fn.expand("$HOME") .. "/.local/include",

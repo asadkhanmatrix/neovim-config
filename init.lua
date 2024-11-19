@@ -37,8 +37,12 @@ map("n", "<leader>t", function()
 end, opts)
 
 -- Line movement
-map({ "n", "i" }, "<A-S-k>", function() vim.cmd("move -2") end, opts)
-map({ "n", "i" }, "<A-S-j>", function() vim.cmd("move +1") end, opts)
+map("n", "<A-S-k>", function() vim.cmd("move -2") end, opts)
+map("n", "<A-S-j>", function() vim.cmd("move +1") end, opts)
+
+-- Line insertion
+map("i", "<A-S-k>", "<esc>O", opts)
+map("i", "<A-S-j>", "<esc>o", opts)
 
 -- Word highlight
 map("n", "<leader>z", function()
