@@ -81,8 +81,8 @@ if vim.g.neovide then
 end
 
 -- Diagnostic related
-map("n", "<leader>dn", function() vim.diagnostic.goto_next() end, {  noremap = true, silent = true, desc = "Goto next diagnostic" })
-map("n", "<leader>dp", function() vim.diagnostic.goto_prev() end, {  noremap = true, silent = true, desc = "Goto prev diagnostic" })
+map("n", "<leader>[d", function() vim.diagnostic.goto_prev() end, {  noremap = true, silent = true, desc = "Goto prev diagnostic" })
+map("n", "<leader>]d", function() vim.diagnostic.goto_next() end, {  noremap = true, silent = true, desc = "Goto next diagnostic" })
 
 -- Load plugin manager and configurations
 require("config.code_execution")

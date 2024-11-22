@@ -18,41 +18,73 @@ return {
             capabilities = capabilities,
             cmd = {
                 "clangd",
-                "--background-index",
-                "--clang-tidy",
-                "--header-insertion=iwyu",
-                "--completion-style=detailed",
-                "--function-arg-placeholders",
-                "--fallback-style=llvm",
-                "--suggest-missing-includes",
-                "--compile-commands-dir=build",  -- Explicitly point to build directory
-                "--query-driver=/usr/bin/c++",   -- Match your compiler
+                "--background-index",           -- Build index in background for faster searching
+                "--clang-tidy",                -- Enable clang-tidy diagnostics
+                "--header-insertion=iwyu",      -- Include what you use for headers
+                "--completion-style=detailed",  -- Detailed completion items
+                "--function-arg-placeholders",  -- Include function argument placeholders
+                "--fallback-style=llvm",       -- LLVM coding style as fallback
+                "--header-insertion-decorators",-- Decorators for headers
+                "--all-scopes-completion",     -- Show completion items from all reachable scopes
+                "--pch-storage=memory",        -- Store PCH in memory for faster processing
+                "--log=error",                 -- Only show errors in logs
+                "--j=8",                       -- Number of parallel processing threads
+                "--compile-commands-dir=build", -- Look for compile_commands.json
+                "--offset-encoding=utf-16",    -- Fix for null-ls
+                "--enable-config",             -- Read from clangd config file
+                "--query-driver=/usr/bin/**/clang-*,/usr/bin/**/g++-*,/usr/bin/**/gcc-*,/usr/local/bin/g++-*",
             },
             filetypes = { "c", "cpp", "objc", "objcpp", "cuda" },
             root_dir = function(fname)
+                local util = require('lspconfig.util')
                 return util.root_pattern(
                     "compile_commands.json",
                     "compile_flags.txt",
                     "CMakeLists.txt",
                     ".git",
-                    "build"
+                    ".clangd",
+                    ".clang-format",
+                    ".clang-tidy"
                 )(fname) or util.find_git_ancestor(fname) or vim.fn.getcwd()
             end,
             init_options = {
-                compilationDatabasePath = "build",
+                -- Clangd initialization options
+                clangdFileStatus = true,
+                usePlaceholders = true,
+                completeUnimported = true,
+                semanticHighlighting = true,
+
+                -- Clang-tidy configuration
+                clangTidy = {
+                    checks = {
+                        "*",
+                        "-fuchsia-*",
+                        "-google-*",
+                        "-zircon-*",
+                        "-abseil-*",
+                        "-modernize-use-trailing-return-type",
+                        "-llvm-*",
+                    },
+                    checkOptions = {
+                        ["bugprone-argument-comment.StrictMode"] = true,
+                        ["bugprone-assert-side-effect.AssertMacros"] = "assert,NSAssert,NSCAssert",
+                        ["modernize-use-nullptr.NullMacros"] = "NULL",
+                    },
+                },
+
+                -- Fallback compilation flags if no compile_commands.json
                 fallbackFlags = {
+                    "-std=c++23",
+                    "-xc++",
+                    "-Wall",
+                    "-Wextra",
+                    "-Wpedantic",
+                    "-Wno-unused-parameter",
                     "-I/usr/include",
                     "-I/usr/local/include",
                     "-I" .. vim.fn.expand("$HOME") .. "/.local/include",
                 }
             },
-            on_init = function(client, _)
-                client.notify("workspace/didChangeConfiguration", {
-                    settings = {
-                        compilationDatabasePath = "build"
-                    }
-                })
-            end,
         })
 
         lspconfig.pyright.setup({
@@ -152,10 +184,10 @@ return {
         vim.keymap.set("n", "<leader>cf", function() require("telescope.builtin").lsp_code_actions() end,
             { desc = "Code action (Telescope)" })
         vim.keymap.set("n", "gr", vim.lsp.buf.references, { desc = "Go to references" })
-        vim.keymap.set("n", "<leader>f", function()
+        vim.keymap.set("n", "<leader>fc", function()
             vim.lsp.buf.format({ async = true })
         end, { desc = "Format code" })
-
+        vim.keymap.set('n', '<leader>ld', vim.diagnostic.setloclist, { noremap = true, silent = true, buffer = bufnr })
 
         -- Add border to hover windows
         vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(
@@ -196,7 +228,7 @@ return {
         })
 
         -- Sign configuration
-        local signs = { Error = " ", Warn = " ", Hint = " ", Info = " " }
+        local signs = { Error = "󰅚 ", Warn = "󰀪 ", Hint = "󰌶 ", Info = " " }
         for type, icon in pairs(signs) do
             local hl = "DiagnosticSign" .. type
             vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
