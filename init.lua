@@ -2,6 +2,11 @@
 vim.g.mapleader = "\\"
 vim.g.maplocalleader = "\\"
 
+-- netrw settings
+vim.g.netrw_preview = 1
+vim.g.netrw_liststyle = 3
+vim.g.netrw_winsize = 30
+
 -- Core Options
 vim.opt.clipboard = "unnamedplus"
 vim.opt.mouse = "a"
@@ -28,7 +33,7 @@ map("n", "j", "gj", opts)
 map("n", "k", "gk", opts)
 map("n", "<Esc>", ":nohlsearch<CR>", opts)
 map("n", "<leader>q", "ZZ", opts)
-map("n", "<leader>ee", ":Explore<CR>", opts)
+map("n", "<leader>ee", ":Lexplore<CR>", opts)
 
 -- Open terminal
 map("n", "<leader>t", function()
@@ -81,8 +86,8 @@ if vim.g.neovide then
 end
 
 -- Diagnostic related
-map("n", "<leader>[d", function() vim.diagnostic.goto_prev() end, {  noremap = true, silent = true, desc = "Goto prev diagnostic" })
-map("n", "<leader>]d", function() vim.diagnostic.goto_next() end, {  noremap = true, silent = true, desc = "Goto next diagnostic" })
+-- map("n", "<leader>[d", function() vim.diagnostic.goto_prev() end, {  noremap = true, silent = true, desc = "Goto prev diagnostic" })
+-- map("n", "<leader>]d", function() vim.diagnostic.goto_next() end, {  noremap = true, silent = true, desc = "Goto next diagnostic" })
 
 -- Load plugin manager and configurations
 require("config.code_execution")

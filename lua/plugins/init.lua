@@ -192,5 +192,7 @@ return {
     -- ai coding assistant
     {
         "Exafunction/codeium.vim",
+        event = "VeryLazy",
+        enabled = false,
     }
 }
