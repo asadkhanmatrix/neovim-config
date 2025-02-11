@@ -12,6 +12,21 @@ local language_configs = {
             end
         }
     },
+    c = {
+        spacing = { tabstop = 2, shiftwidth = 2 },
+        commands = {
+            compile = function(file, output)
+                return string.format(
+                    "time gcc -O2 -Wall -Wpedantic -fsanitize=undefined %s -o %s",
+                    file,
+                    output
+                )
+            end,
+            execute = function(file)
+                return "time " .. file
+            end
+        }
+    },
     cpp = {
         spacing = { tabstop = 2, shiftwidth = 2 },
         commands = {
@@ -23,7 +38,7 @@ local language_configs = {
                 )
             end,
             execute = function(file)
-                return file
+                return "time " .. file
             end
         }
     },
@@ -34,7 +49,7 @@ local language_configs = {
                 return string.format("time rustc %s -o %s", file, output)
             end,
             execute = function(file)
-                return file
+                return "time " .. file
             end
         }
     },
@@ -42,10 +57,10 @@ local language_configs = {
         spacing = { tabstop = 4, shiftwidth = 4 },
         commands = {
             compile = function(file)
-                return string.format("time zig build-exe %s -O ReleaseSafe", file)
+                return string.format("time zig build-exe %s", file)
             end,
             execute = function(file)
-                return file
+                return "time " .. file
             end
         }
     }
@@ -63,7 +78,7 @@ local function setup_editor_config(config)
 end
 
 local function create_terminal_command(cmd)
-    return string.format("vnew | terminal %s", cmd)
+    return string.format("botright 15split | terminal %s", cmd)
 end
 
 -- Create language setup function

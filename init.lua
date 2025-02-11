@@ -31,9 +31,8 @@ map("n", "<leader>q", "ZZ", opts)
 map("n", "<leader>ee", ":Explore<CR>", opts)
 
 -- Open terminal
-map("n", "<leader>t", function()
-    vim.cmd("vnew | terminal ")
-    vim.cmd("vertical resize 60")
+map("n", "<leader>tt", function()
+    vim.cmd("botright 15split | terminal ")
 end, opts)
 
 -- Line movement
@@ -63,7 +62,7 @@ vim.api.nvim_create_autocmd({ "InsertLeave", "TextChanged" }, {
 })
 
 if vim.g.neovide then
-    vim.o.guifont = "JetBrainsMono Nerd Font:h12"
+    vim.o.guifont = "JetBrainsMono Nerd Font:h14"
 
     vim.opt.linespace = 0
 
@@ -75,14 +74,14 @@ if vim.g.neovide then
     vim.g.neovide_padding_right = 0
     vim.g.neovide_padding_left = 0
 
-    vim.g.neovide_window_blurred = true
+    -- vim.g.neovide_window_blurred = true
 
     vim.g.neovide_cursor_antialiasing = true
 end
 
 -- Diagnostic related
-map("n", "<leader>[d", function() vim.diagnostic.goto_prev() end, {  noremap = true, silent = true, desc = "Goto prev diagnostic" })
-map("n", "<leader>]d", function() vim.diagnostic.goto_next() end, {  noremap = true, silent = true, desc = "Goto next diagnostic" })
+-- map("n", "<leader>[d", function() vim.diagnostic.goto_prev() end, {  noremap = true, silent = true, desc = "Goto prev diagnostic" })
+-- map("n", "<leader>]d", function() vim.diagnostic.goto_next() end, {  noremap = true, silent = true, desc = "Goto next diagnostic" })
 
 -- Load plugin manager and configurations
 require("config.code_execution")

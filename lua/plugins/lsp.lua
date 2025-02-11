@@ -103,22 +103,89 @@ return {
         -- Rust configuration
         lspconfig.rust_analyzer.setup({
             capabilities = capabilities,
+            -- Smart root directory detection
+            root_dir = function(fname)
+                -- First look for Cargo.toml
+                local cargo_crate_dir = lspconfig.util.root_pattern('Cargo.toml')(fname)
+                if cargo_crate_dir then
+                    return cargo_crate_dir
+                end
+
+                -- If no Cargo.toml found, try other Rust files or fall back to current directory
+                return lspconfig.util.root_pattern('rust-project.json', '.git')(fname) or
+                    vim.fn.getcwd()
+            end,
             settings = {
                 ["rust-analyzer"] = {
-                    diagnostics = {
-                        enable = true,
-                    },
-                    checkOnSave = {
-                        command = "clippy",
+                    -- Enable all features for better standalone file support
+                    assist = {
+                        importGranularity = "module",
+                        importPrefix = "by_self",
                     },
                     cargo = {
+                        loadOutDirsFromCheck = true,
                         allFeatures = true,
+                        -- Allow cargo to work without Cargo.toml
+                        noDefaultFeatures = false,
                     },
+                    -- Enhanced diagnostics
+                    checkOnSave = {
+                        command = "clippy",
+                        extraArgs = {"--all-targets", "--all-features"}
+                    },
+                    -- Standalone file support
+                    files = {
+                        excludeDirs = {},
+                        watcher = "client",
+                    },
+                    -- More reliable proc macros
                     procMacro = {
                         enable = true,
+                        ignored = {
+                            ["async-trait"] = { "async_trait" },
+                            ["napi-derive"] = { "napi" },
+                            ["async-recursion"] = { "async_recursion" },
+                        },
+                    },
+                    -- Better support for single files
+                    diagnostics = {
+                        enable = true,
+                        experimental = {
+                            enable = true,
+                        },
+                    },
+                    -- Enable standalone file completion and analysis
+                    workspace = {
+                        symbol = {
+                            search = {
+                                scope = "workspace_and_dependencies",
+                            },
+                        },
+                    },
+                    -- Help rust-analyzer find standard library
+                    server = {
+                        extraEnv = {
+                            RUST_SRC_PATH = vim.fn.expand("~/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library"),
+                        },
                     },
                 },
             },
+            -- Ensure all features are properly initialized
+            on_attach = function(client, bufnr)
+                -- Enable formatting
+                if client.server_capabilities.documentFormattingProvider then
+                    vim.api.nvim_buf_create_user_command(bufnr, "Format", 
+                        function() vim.lsp.buf.format({ async = true }) end, 
+                        { desc = "Format current buffer with LSP" }
+                    )
+                end
+
+                -- Fixed inlay hints
+                if client.server_capabilities.inlayHintProvider then
+                    -- The correct order is (enable, bufnr), not (bufnr, true)
+                    vim.lsp.inlay_hint.enable(true)
+                end
+            end,
         })
 
         -- Zig configuration
@@ -173,6 +240,7 @@ return {
         vim.keymap.set("n", "K", vim.lsp.buf.hover, { desc = "Hover documentation" })
         vim.keymap.set("n", "gi", vim.lsp.buf.implementation, { desc = "Go to implementation" })
         vim.keymap.set("n", "<C-k>", vim.lsp.buf.signature_help, { desc = "Signature help" })
+        vim.keymap.set("n", "<leader>th", ":ClangdSwitchSourceHeader<CR>", { noremap = true, silent = true, desc = "Switch between source and header" })
         vim.keymap.set("n", "<leader>wa", vim.lsp.buf.add_workspace_folder, { desc = "Add workspace folder" })
         vim.keymap.set("n", "<leader>wr", vim.lsp.buf.remove_workspace_folder, { desc = "Remove workspace folder" })
         vim.keymap.set("n", "<leader>wl", function()

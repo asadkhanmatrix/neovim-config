@@ -1,19 +1,20 @@
 -- lua/plugins/init.lua
 return {
     -- Color scheme
-    {
-        "ishan9299/nvim-solarized-lua",
-        name = "solarized",
-        lazy = false,
-        priority = 1000,
-        config = function()
-            vim.o.background = "light" -- Set to light mode
-            vim.cmd([[colorscheme solarized]])
-        end,
-    },
-    --{ "Shatur/neovim-ayu", name = "ayu", lazy = false, priority = 1000, config = function() vim.cmd([[colorscheme ayu]]) end, },
+    -- {
+    --     "ishan9299/nvim-solarized-lua",
+    --     name = "solarized",
+    --     lazy = false,
+    --     priority = 1000,
+    --     config = function()
+    --         vim.o.background = "light" -- Set to light mode
+    --         vim.cmd([[colorscheme solarized]])
+    --     end,
+    -- },
+    -- { "Shatur/neovim-ayu", name = "ayu", lazy = false, priority = 1000, config = function() vim.cmd([[colorscheme ayu]]) end, },
     --{ "catppuccin/nvim", name = "catppuccin", lazy = false, priority = 1000, config = function() vim.cmd([[colorscheme catppuccin]]) end, },
-    --{ "bluz71/vim-nightfly-colors", name = "nightfly", lazy = false, priority = 1000, config = function() vim.cmd([[colorscheme nightfly]]) end, },
+    { "bluz71/vim-nightfly-colors", name = "nightfly", lazy = false, priority = 1000, config = function() vim.cmd([[colorscheme nightfly]]) end, },
+    -- { "blazkowolf/gruber-darker.nvim", lazy = false, priority = 1000, },
     --{ "folke/tokyonight.nvim", lazy = false, priority = 1000, config = function() vim.cmd([[colorscheme tokyonight]]) end, },
 
     -- LSP Support
@@ -192,5 +193,7 @@ return {
     -- ai coding assistant
     {
         "Exafunction/codeium.vim",
+        event = "InsertEnter",
+        enabled = false,
     }
 }
