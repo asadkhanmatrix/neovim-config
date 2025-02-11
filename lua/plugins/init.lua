@@ -193,7 +193,7 @@ return {
     -- ai coding assistant
     {
         "Exafunction/codeium.vim",
-        event = "InsertEnter",
+        event = "VeryLazy",
         enabled = false,
     }
 }
