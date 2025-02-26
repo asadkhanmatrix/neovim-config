@@ -10,14 +10,17 @@ local language_configs = {
             execute = function(file)
                 return string.format("time python3 %s", file)
             end
+        },
+        project = {
+            detect = function() return false end, -- Default no project detection for Python
         }
     },
     c = {
-        spacing = { tabstop = 2, shiftwidth = 2 },
+        spacing = { tabstop = 4, shiftwidth = 4 },
         commands = {
             compile = function(file, output)
                 return string.format(
-                    "time gcc -O2 -Wall -Wpedantic -fsanitize=undefined %s -o %s",
+                    "time gcc -O2 -Wall -Wpedantic %s -o %s",
                     file,
                     output
                 )
@@ -25,6 +28,9 @@ local language_configs = {
             execute = function(file)
                 return "time " .. file
             end
+        },
+        project = {
+            detect = function() return false end, -- Default no project detection
         }
     },
     cpp = {
@@ -40,6 +46,9 @@ local language_configs = {
             execute = function(file)
                 return "time " .. file
             end
+        },
+        project = {
+            detect = function() return false end, -- Default no project detection
         }
     },
     rust = {
@@ -50,6 +59,19 @@ local language_configs = {
             end,
             execute = function(file)
                 return "time " .. file
+            end
+        },
+        project = {
+            detect = function() 
+                -- Check for Cargo.toml in the current or parent directories
+                local cargo_file = vim.fn.findfile("Cargo.toml", ".;")
+                return cargo_file ~= ""
+            end,
+            build = function()
+                return "time cargo build"
+            end,
+            run = function()
+                return "time cargo run"
             end
         }
     },
@@ -62,15 +84,24 @@ local language_configs = {
             execute = function(file)
                 return "time " .. file
             end
+        },
+        project = {
+            detect = function()
+                -- Check for build.zig in the current or parent directories
+                local build_file = vim.fn.findfile("build.zig", ".;")
+                return build_file ~= ""
+            end,
+            build = function()
+                return "time zig build"
+            end,
+            run = function()
+                return "time zig build run"
+            end
         }
     }
 }
 
 -- Helper functions
-local function setup_window_split()
-    vim.cmd("vertical resize 60")
-end
-
 local function setup_editor_config(config)
     vim.opt_local.expandtab = true
     vim.opt_local.tabstop = config.spacing.tabstop
@@ -78,7 +109,14 @@ local function setup_editor_config(config)
 end
 
 local function create_terminal_command(cmd)
-    return string.format("botright 15split | terminal %s", cmd)
+    return string.format("botright 20split | terminal %s", cmd)
+end
+
+-- Get the project root directory
+local function get_project_root()
+    -- Get the directory of the current file
+    local current_dir = vim.fn.expand("%:p:h")
+    return current_dir
 end
 
 -- Create language setup function
@@ -87,31 +125,49 @@ local function setup_language(lang_config)
         -- Set up editor configuration
         setup_editor_config(lang_config)
 
-        -- Set up compilation if available
-        if lang_config.commands.compile then
-            vim.keymap.set("n", "<leader>bs", function()
+        -- Check if we're in a project
+        local is_project = lang_config.project and lang_config.project.detect()
+
+        -- Set up compilation/build
+        vim.keymap.set("n", "<leader>bs", function()
+            vim.cmd("write")
+            
+            if vim.lsp.buf.format then
+                vim.lsp.buf.format()
+            end
+            
+            local compile_cmd
+            if is_project and lang_config.project.build then
+                -- Use project build command
+                compile_cmd = lang_config.project.build()
+            elseif lang_config.commands.compile then
+                -- Use individual file compilation
                 local file = vim.fn.expand("%:p")
                 local output = vim.fn.expand("%:r")
+                compile_cmd = lang_config.commands.compile(file, output)
+            else
+                vim.notify("No compilation/build command available", vim.log.levels.WARN)
+                return
+            end
+            
+            vim.cmd(create_terminal_command(compile_cmd))
+        end, { noremap = true, silent = true })
 
-                vim.cmd("write")
-                if vim.lsp.buf.format then
-                    vim.lsp.buf.format()
-                end
-
-                local compile_cmd = lang_config.commands.compile(file, output)
-                vim.cmd(create_terminal_command(compile_cmd))
-                setup_window_split()
-            end, { noremap = true, silent = true })
-        end
-
-        -- Set up execution
+        -- Set up execution/run
         vim.keymap.set("n", "<leader>ds", function()
-            local file = vim.fn.expand(lang_config.commands.compile and "%:p:r" or "%:p")
-
             vim.cmd("write")
-            local execute_cmd = lang_config.commands.execute(file)
+            
+            local execute_cmd
+            if is_project and lang_config.project.run then
+                -- Use project run command
+                execute_cmd = lang_config.project.run()
+            else
+                -- Use individual file execution
+                local file = vim.fn.expand(lang_config.commands.compile and "%:p:r" or "%:p")
+                execute_cmd = lang_config.commands.execute(file)
+            end
+            
             vim.cmd(create_terminal_command(execute_cmd))
-            setup_window_split()
         end, { noremap = true, silent = true })
     end
 end

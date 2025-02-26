@@ -24,6 +24,8 @@ vim.opt.tabstop = 4
 vim.opt.shiftwidth = 4
 vim.opt.expandtab = true
 
+vim.cmd[[colorscheme zellner]]
+
 -- Basic Keymaps
 local map = vim.keymap.set
 local opts = { noremap = true, silent = true }
