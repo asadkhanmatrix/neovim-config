@@ -44,7 +44,6 @@ return {
                     "clangd",
                     "pyright",
                     "rust_analyzer",
-                    "zls",
                 },
                 automatic_installation = true,
             })

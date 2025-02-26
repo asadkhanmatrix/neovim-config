@@ -191,7 +191,7 @@ return {
         -- Zig configuration
         lspconfig.zls.setup({
             capabilities = capabilities,
-            cmd = { vim.fn.expand("~/.local/share/nvim/mason/bin/zls") },
+            cmd = { "zls" },
             filetypes = { "zig" },
             root_dir = function(fname)
                 return util.root_pattern(
