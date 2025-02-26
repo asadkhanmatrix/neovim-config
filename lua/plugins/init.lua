@@ -13,7 +13,7 @@ return {
     },
     --{ "Shatur/neovim-ayu", name = "ayu", lazy = false, priority = 1000, config = function() vim.cmd([[colorscheme ayu]]) end, },
     --{ "catppuccin/nvim", name = "catppuccin", lazy = false, priority = 1000, config = function() vim.cmd([[colorscheme catppuccin]]) end, },
-    --{ "bluz71/vim-nightfly-colors", name = "nightfly", lazy = false, priority = 1000, config = function() vim.cmd([[colorscheme nightfly]]) end, },
+    -- { "bluz71/vim-nightfly-colors", name = "nightfly", lazy = false, priority = 1000, config = function() vim.cmd([[colorscheme nightfly]]) end, },
     --{ "folke/tokyonight.nvim", lazy = false, priority = 1000, config = function() vim.cmd([[colorscheme tokyonight]]) end, },
 
     -- LSP Support
@@ -43,7 +43,6 @@ return {
                     "clangd",
                     "pyright",
                     "rust_analyzer",
-                    "zls",
                 },
                 automatic_installation = true,
             })
@@ -192,5 +191,7 @@ return {
     -- ai coding assistant
     {
         "Exafunction/codeium.vim",
+        event = "InsertEnter",
+        enabled = false,
     }
 }

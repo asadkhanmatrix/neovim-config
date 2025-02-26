@@ -8,7 +8,22 @@ local language_configs = {
         commands = {
             compile = nil,  -- Python doesn't need compilation
             execute = function(file)
-                return string.format("time python3 %s", file)
+                return string.format("timeit python %s", file)
+            end
+        }
+    },
+    c = {
+        spacing = { tabstop = 2, shiftwidth = 2 },
+        commands = {
+            compile = function(file, output)
+                return string.format(
+                    "timeit gcc -O2 -Wall -Wpedantic %s -o %s",
+                    file,
+                    output
+                )
+            end,
+            execute = function(file)
+                return "timeit " .. file
             end
         }
     },
@@ -17,13 +32,13 @@ local language_configs = {
         commands = {
             compile = function(file, output)
                 return string.format(
-                    "time g++ -std=c++23 -O2 -Wall -Wpedantic -fsanitize=undefined %s -o %s",
+                    "timeit g++ -std=c++23 -O2 -Wall -Wpedantic %s -o %s",
                     file,
                     output
                 )
             end,
             execute = function(file)
-                return file
+                return "timeit " .. file
             end
         }
     },
@@ -31,10 +46,10 @@ local language_configs = {
         spacing = { tabstop = 4, shiftwidth = 4 },
         commands = {
             compile = function(file, output)
-                return string.format("time rustc %s -o %s", file, output)
+                return string.format("timeit rustc %s -o %s", file, output)
             end,
             execute = function(file)
-                return file
+                return "timeit " .. file
             end
         }
     },
@@ -42,19 +57,19 @@ local language_configs = {
         spacing = { tabstop = 4, shiftwidth = 4 },
         commands = {
             compile = function(file)
-                return string.format("time zig build-exe %s -O ReleaseSafe", file)
+                return string.format("timeit zig build-exe %s ", file)
             end,
             execute = function(file)
-                return file
+                return "timeit " .. file
             end
         }
     }
 }
 
 -- Helper functions
-local function setup_window_split()
-    vim.cmd("vertical resize 60")
-end
+-- local function setup_window_split()
+--     vim.cmd("vertical resize 30")
+-- end
 
 local function setup_editor_config(config)
     vim.opt_local.expandtab = true
@@ -63,7 +78,7 @@ local function setup_editor_config(config)
 end
 
 local function create_terminal_command(cmd)
-    return string.format("vnew | terminal %s", cmd)
+    return string.format("botright 15split | terminal %s", cmd)
 end
 
 -- Create language setup function
@@ -85,7 +100,7 @@ local function setup_language(lang_config)
 
                 local compile_cmd = lang_config.commands.compile(file, output)
                 vim.cmd(create_terminal_command(compile_cmd))
-                setup_window_split()
+                -- setup_window_split()
             end, { noremap = true, silent = true })
         end
 
@@ -96,7 +111,7 @@ local function setup_language(lang_config)
             vim.cmd("write")
             local execute_cmd = lang_config.commands.execute(file)
             vim.cmd(create_terminal_command(execute_cmd))
-            setup_window_split()
+            -- setup_window_split()
         end, { noremap = true, silent = true })
     end
 end

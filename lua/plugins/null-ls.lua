@@ -3,12 +3,16 @@ return {
     event = "VeryLazy",
     config = function()
         local null_ls = require("null-ls")
-        
         null_ls.setup({
             sources = {
-                null_ls.builtins.formatting.clang_format,
+                -- clang-format with style argument (e.g., 'LLVM', 'Google')
+                null_ls.builtins.formatting.clang_format.with({
+                    extra_args = { "--style=Google" },  -- Optional: Change to 'LLVM', 'Chromium', etc.
+                }),
+
+                -- black for Python, with additional arguments
                 null_ls.builtins.formatting.black.with({
-                    extra_args = { "--fast" },  -- Optional: use '--line-length 79' or other args as needed
+                    extra_args = { "--fast", "--line-length=79" },  -- Add or adjust args as needed
                 }),
             },
         })

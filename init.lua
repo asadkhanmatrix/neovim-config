@@ -2,6 +2,11 @@
 vim.g.mapleader = "\\"
 vim.g.maplocalleader = "\\"
 
+-- netrw settings
+vim.g.netrw_preview = 1
+vim.g.netrw_liststyle = 3
+vim.g.netrw_winsize = 30
+
 -- Core Options
 vim.opt.clipboard = "unnamedplus"
 vim.opt.mouse = "a"
@@ -31,14 +36,33 @@ map("n", "<leader>q", "ZZ", opts)
 map("n", "<leader>ee", ":Explore<CR>", opts)
 
 -- Open terminal
-map("n", "<leader>t", function()
-    vim.cmd("vnew | terminal ")
-    vim.cmd("vertical resize 60")
+map("n", "<leader>tt", function()
+    vim.cmd("botright 20split | terminal ")
 end, opts)
+
+-- Terminal mode mappings
+-- map("t", "<M-h>", [[<C-\><C-N><C-w>h]], opts)
+-- map("t", "<M-j>", [[<C-\><C-N><C-w>j]], opts)
+-- map("t", "<M-k>", [[<C-\><C-N><C-w>k]], opts)
+-- map("t", "<M-l>", [[<C-\><C-N><C-w>l]], opts)
+
+-- Insert mode mappings
+-- map("i", "<M-h>", [[<C-\><C-N><C-w>h]], opts)
+-- map("i", "<M-j>", [[<C-\><C-N><C-w>j]], opts)
+-- map("i", "<M-k>", [[<C-\><C-N><C-w>k]], opts)
+-- map("i", "<M-l>", [[<C-\><C-N><C-w>l]], opts)
+
+-- Normal mode mappings
+-- map("n", "<M-h>", [[<C-w>h]], opts)
+-- map("n", "<M-j>", [[<C-w>j]], opts)
+-- map("n", "<M-k>", [[<C-w>k]], opts)
+-- map("n", "<M-l>", [[<C-w>l]], opts)
 
 -- Line movement
 map("n", "<A-S-k>", function() vim.cmd("move -2") end, opts)
 map("n", "<A-S-j>", function() vim.cmd("move +1") end, opts)
+map("v", "<A-S-k>", ":move '<-2<CR>gv=gv", opts)
+map("v", "<A-S-j>", ":move '>+1<CR>gv=gv", opts)
 
 -- Line insertion
 map("i", "<A-S-k>", "<esc>O", opts)
@@ -63,7 +87,8 @@ vim.api.nvim_create_autocmd({ "InsertLeave", "TextChanged" }, {
 })
 
 if vim.g.neovide then
-    vim.o.guifont = "JetBrainsMono Nerd Font:h12"
+    --vim.o.guifont = "JetBrainsMono Nerd Font:h12"
+    vim.o.guifont = "Cascadia Mono:h12.5"
 
     vim.opt.linespace = 0
 
@@ -78,11 +103,18 @@ if vim.g.neovide then
     vim.g.neovide_window_blurred = true
 
     vim.g.neovide_cursor_antialiasing = true
+
+    -- vim.g.neovide_title_background_color = string.format(
+    --     "%x",
+    --     vim.api.nvim_get_hl(0, {id=vim.api.nvim_get_hl_id_by_name("Normal")}).bg
+    -- )
+    vim.g.neovide_title_background_color = "pink"
+    vim.g.neovide_title_text_color = "green"
 end
 
 -- Diagnostic related
-map("n", "<leader>dn", function() vim.diagnostic.goto_next() end, {  noremap = true, silent = true, desc = "Goto next diagnostic" })
-map("n", "<leader>dp", function() vim.diagnostic.goto_prev() end, {  noremap = true, silent = true, desc = "Goto prev diagnostic" })
+-- map("n", "<leader>[d", function() vim.diagnostic.goto_prev() end, {  noremap = true, silent = true, desc = "Goto prev diagnostic" })
+-- map("n", "<leader>]d", function() vim.diagnostic.goto_next() end, {  noremap = true, silent = true, desc = "Goto next diagnostic" })
 
 -- Load plugin manager and configurations
 require("config.code_execution")
