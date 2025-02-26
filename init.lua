@@ -19,7 +19,7 @@ vim.opt.smartcase = true
 vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.termguicolors = true
-vim.opt.autochdir = true
+-- vim.opt.autochdir = true
 vim.opt.tabstop = 4
 vim.opt.shiftwidth = 4
 vim.opt.expandtab = true
@@ -36,14 +36,15 @@ map("n", "<leader>q", "ZZ", opts)
 map("n", "<leader>ee", ":Lexplore<CR>", opts)
 
 -- Open terminal
-map("n", "<leader>t", function()
-    vim.cmd("vnew | terminal ")
-    vim.cmd("vertical resize 60")
+map("n", "<leader>tt", function()
+    vim.cmd("botright 20split | terminal ")
 end, opts)
 
 -- Line movement
 map("n", "<A-S-k>", function() vim.cmd("move -2") end, opts)
 map("n", "<A-S-j>", function() vim.cmd("move +1") end, opts)
+map("v", "<A-S-k>", ":move '<-2<CR>gv=gv", opts)
+map("v", "<A-S-j>", ":move '>+1<CR>gv=gv", opts)
 
 -- Line insertion
 map("i", "<A-S-k>", "<esc>O", opts)
@@ -68,7 +69,8 @@ vim.api.nvim_create_autocmd({ "InsertLeave", "TextChanged" }, {
 })
 
 if vim.g.neovide then
-    vim.o.guifont = "JetBrainsMono Nerd Font:h12"
+    --vim.o.guifont = "JetBrainsMono Nerd Font:h12"
+    vim.o.guifont = "Cascadia Mono:h12.5"
 
     vim.opt.linespace = 0
 

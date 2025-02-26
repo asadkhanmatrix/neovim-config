@@ -100,31 +100,173 @@ return {
             end,
         })
 
+        lspconfig.asm_lsp.setup({
+            command= "asm-lsp",
+            root_dir = function(fname)
+                local util = require('lspconfig.util')
+                return util.root_pattern(
+                    "compile_commands.json",
+                    "compile_flags.txt",
+                    "CMakeLists.txt",
+                    ".git",
+                    ".clangd",
+                    ".clang-format",
+                    ".clang-tidy"
+                )(fname) or util.find_git_ancestor(fname) or vim.fn.getcwd()
+            end,
+            filetypes= {
+                "asm", "s", "S"
+            },
+        })
+
         -- Rust configuration
         lspconfig.rust_analyzer.setup({
             capabilities = capabilities,
             settings = {
                 ["rust-analyzer"] = {
-                    diagnostics = {
-                        enable = true,
-                    },
-                    checkOnSave = {
-                        command = "clippy",
-                    },
+                    -- Enable all features in Cargo.toml
                     cargo = {
                         allFeatures = true,
+                        loadOutDirsFromCheck = true,
+                        runBuildScripts = true,
                     },
+                    -- Detailed diagnostics
+                    diagnostics = {
+                        enable = true,
+                        experimental = {
+                            enable = true,
+                        },
+                        disabled = {"unresolved-proc-macro"},
+                    },
+                    -- Enhanced code completion
+                    completion = {
+                        addCallArgumentSnippets = true,
+                        addCallParenthesis = true,
+                        addFunctionSnippets = true,
+                        postfix = {
+                            enable = true,
+                        },
+                        autoimport = {
+                            enable = true,
+                        },
+                        privateEditable = {
+                            enable = true,
+                        },
+                    },
+                    -- Better code analysis
+                    checkOnSave = {
+                        command = "clippy",
+                        extraArgs = {"--all-features", "--all-targets"},
+                    },
+                    -- Improved hover actions
+                    hover = {
+                        actions = {
+                            enable = true,
+                            debug = true,
+                            gotoTypeDef = true,
+                            implementations = true,
+                            run = true,
+                        },
+                        documentation = {
+                            enable = true,
+                            keywords = true,
+                        },
+                    },
+                    -- Helpful inline hints
+                    inlayHints = {
+                        bindingModeHints = {
+                            enable = true,
+                        },
+                        chainingHints = {
+                            enable = true,
+                        },
+                        closingBraceHints = {
+                            enable = true,
+                            minLines = 25,
+                        },
+                        closureReturnTypeHints = {
+                            enable = "always",
+                        },
+                        discriminantHints = {
+                            enable = "always",
+                        },
+                        expressionAdjustmentHints = {
+                            enable = "always",
+                        },
+                        lifetimeElisionHints = {
+                            enable = "always",
+                            useParameterNames = true,
+                        },
+                        parameterHints = {
+                            enable = true,
+                        },
+                        typeHints = {
+                            enable = true,
+                            hideClosureInitialization = false,
+                            hideNamedConstructor = false,
+                        },
+                    },
+                    -- Enable procedure macros
                     procMacro = {
                         enable = true,
+                        ignored = {},
+                    },
+                    -- Lens features (code actions)
+                    lens = {
+                        enable = true,
+                        debug = true,
+                        implementations = true,
+                        run = true,
+                        methodReferences = true,
+                        references = true,
+                    },
+                    -- Improved imports organization
+                    imports = {
+                        granularity = {
+                            group = "module",
+                        },
+                        prefix = "self",
+                        enforce = true,
+                    },
+                    -- Better code actions
+                    assist = {
+                        emitMustUse = true,
+                        expressionFillDefault = true,
                     },
                 },
             },
+            -- LSP Handlers
+            handlers = {
+                ["textDocument/publishDiagnostics"] = vim.lsp.with(
+                    vim.lsp.diagnostic.on_publish_diagnostics, {
+                        virtual_text = true,
+                        signs = true,
+                        update_in_insert = true,
+                        underline = true,
+                    }
+                ),
+            },
+            -- On Attach
+            on_attach = function(client, bufnr)
+                -- Enable inlay hints by default
+                if client.server_capabilities.inlayHintProvider then
+                    vim.lsp.inlay_hint.enable(true)
+                end
+
+                -- Enable document formatting if supported
+                if client.server_capabilities.documentFormattingProvider then
+                    vim.api.nvim_buf_create_user_command(bufnr, "Format",
+                        function() vim.lsp.buf.format({ async = true }) end,
+                        { desc = "Format current buffer with LSP" }
+                    )
+                end
+            end,
         })
 
         -- Zig configuration
         lspconfig.zls.setup({
             capabilities = capabilities,
-            cmd = { vim.fn.expand("~/.local/share/nvim/mason/bin/zls") },
+            cmd = {"zls"},
             filetypes = { "zig" },
             root_dir = function(fname)
                 return util.root_pattern(
@@ -173,6 +315,7 @@ return {
         vim.keymap.set("n", "K", vim.lsp.buf.hover, { desc = "Hover documentation" })
         vim.keymap.set("n", "gi", vim.lsp.buf.implementation, { desc = "Go to implementation" })
         vim.keymap.set("n", "<C-k>", vim.lsp.buf.signature_help, { desc = "Signature help" })
+        vim.keymap.set("n", "<leader>th", ":ClangdSwitchSourceHeader<CR>", { noremap = true, silent = true, desc = "Switch between source and header file" })
         vim.keymap.set("n", "<leader>wa", vim.lsp.buf.add_workspace_folder, { desc = "Add workspace folder" })
         vim.keymap.set("n", "<leader>wr", vim.lsp.buf.remove_workspace_folder, { desc = "Remove workspace folder" })
         vim.keymap.set("n", "<leader>wl", function()

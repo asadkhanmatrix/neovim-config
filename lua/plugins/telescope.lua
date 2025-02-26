@@ -6,6 +6,24 @@ return {
     },
     config = function()
         local telescope = require("telescope")
+
+        local function find_project_root()
+            -- Find project root (look for .git, package.json, etc.)
+            local current_dir = vim.fn.getcwd()
+            local marker_files = { ".git", "package.json", "Makefile", "CMakeLists.txt", "build.zig", "Cargo.toml" }
+            local path = vim.fs.find(marker_files, {
+                type = "dir",
+                path = current_dir,
+                stop = true,
+            })[1]
+
+            if path then
+                return vim.fs.dirname(path)
+            else
+                return current_dir -- Or a default path if no project root is found
+            end
+        end
+
         telescope.setup({
             defaults = {
                 prompt_prefix = "❯ ",
