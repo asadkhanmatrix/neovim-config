@@ -37,16 +37,17 @@ return {
 
     {
         "williamboman/mason-lspconfig.nvim",
-        config = function()
-            require("mason-lspconfig").setup({
-                ensure_installed = {
-                    "clangd",
-                    "pyright",
-                    "rust_analyzer",
-                },
-                automatic_installation = true,
-            })
-        end,
+        -- config = function()
+        --     require("mason-lspconfig").setup({
+        --         ensure_installed = {
+        --             "zls",
+        --             "clangd",
+        --             "pyright",
+        --             "rust_analyzer",
+        --         },
+        --         automatic_installation = true,
+        --     })
+        -- end,
     },
 
     -- Autocompletion
@@ -78,6 +79,7 @@ return {
                     "zig",
                     "markdown",
                     "markdown_inline",
+                    "nasm",
                 },
                 highlight = { enable = true },
                 indent = { enable = true },
@@ -136,7 +138,7 @@ return {
     },
 
     {
-        "jose-elias-alvarez/null-ls.nvim",
+        "nvimtools/none-ls.nvim",
     },
 
     {

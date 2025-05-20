@@ -92,13 +92,27 @@ local language_configs = {
                 return build_file ~= ""
             end,
             build = function()
-                return "time zig build"
+                return "time zig build --summary all"
             end,
             run = function()
                 return "time zig build run"
             end
         }
-    }
+    },
+    nasm = {
+        spacing = { tabstop = 4, shiftwidth = 4 },
+        commands = {
+            compile = function(file, output)
+                return string.format("time nasm -f elf64 %s -o %s.o && ld %s.o -o %s", file, output, output, output)
+            end,
+            execute = function(file)
+                return "time " .. file
+            end
+        },
+        project = {
+            detect = function() return false end, -- Default no project detection for nasm
+        }
+    },
 }
 
 -- Helper functions
@@ -172,11 +186,15 @@ local function setup_language(lang_config)
     end
 end
 
+local patterns = {
+  nasm = { "nasm", "asm", "s" },
+}
+
 -- Register autocmds for each language
 for lang, config in pairs(language_configs) do
     vim.api.nvim_create_autocmd("FileType", {
         group = group,
-        pattern = lang,
+        pattern = patterns[lang] or lang,
         callback = setup_language(config)
     })
 end

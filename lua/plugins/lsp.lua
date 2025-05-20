@@ -87,6 +87,7 @@ return {
             },
         })
 
+        -- Python configuration
         lspconfig.pyright.setup({
             capabilities = capabilities,
             root_dir = function(fname)
@@ -100,24 +101,24 @@ return {
             end,
         })
 
-        lspconfig.asm_lsp.setup({
-            command= "asm-lsp",
-            root_dir = function(fname)
-                local util = require('lspconfig.util')
-                return util.root_pattern(
-                    "compile_commands.json",
-                    "compile_flags.txt",
-                    "CMakeLists.txt",
-                    ".git",
-                    ".clangd",
-                    ".clang-format",
-                    ".clang-tidy"
-                )(fname) or util.find_git_ancestor(fname) or vim.fn.getcwd()
-            end,
-            filetypes= {
-                "asm", "s", "S"
-            },
-        })
+        -- lspconfig.asm_lsp.setup({
+        --     command= "asm-lsp",
+        --     root_dir = function(fname)
+        --         local util = require('lspconfig.util')
+        --         return util.root_pattern(
+        --             "compile_commands.json",
+        --             "compile_flags.txt",
+        --             "CMakeLists.txt",
+        --             ".git",
+        --             ".clangd",
+        --             ".clang-format",
+        --             ".clang-tidy"
+        --         )(fname) or util.find_git_ancestor(fname) or vim.fn.getcwd()
+        --     end,
+        --     filetypes= {
+        --         -- "asm", "s", "S"
+        --     },
+        -- })
 
         -- Rust configuration
         lspconfig.rust_analyzer.setup({
@@ -154,10 +155,7 @@ return {
                         },
                     },
                     -- Better code analysis
-                    checkOnSave = {
-                        command = "clippy",
-                        extraArgs = {"--all-features", "--all-targets"},
-                    },
+                    checkOnSave = true,
                     -- Improved hover actions
                     hover = {
                         actions = {
@@ -209,7 +207,7 @@ return {
                     -- Enable procedure macros
                     procMacro = {
                         enable = true,
-                        ignored = {},
+                        -- ignored = {},
                     },
                     -- Lens features (code actions)
                     lens = {
@@ -231,7 +229,7 @@ return {
                     -- Better code actions
                     assist = {
                         emitMustUse = true,
-                        expressionFillDefault = true,
+                        expressionFillDefault = "default",
                     },
                 },
             },
@@ -358,23 +356,18 @@ return {
         -- Diagnostic configuration
         vim.diagnostic.config({
             signs = {
+                -- Set minimum severity level for displaying signs
                 severity = {
-                    min = vim.diagnostic.severity.HINT, -- Set minimum severity level for signs
+                    min = vim.diagnostic.severity.HINT,
                 },
-                values = {
-                    { name = "DiagnosticSignError", text = "E" },
-                    { name = "DiagnosticSignWarn",  text = "W" },
-                    { name = "DiagnosticSignInfo",  text = "I" },
-                    { name = "DiagnosticSignHint",  text = "H" },
-                },
+                -- Define sign icons per severity level
+                text = {
+                    [vim.diagnostic.severity.ERROR] = "󰅚",
+                    [vim.diagnostic.severity.WARN]  = "󰀪",
+                    [vim.diagnostic.severity.INFO]  = "I",
+                    [vim.diagnostic.severity.HINT]  = "󰌶",
+                }
             },
         })
-
-        -- Sign configuration
-        local signs = { Error = "󰅚 ", Warn = "󰀪 ", Hint = "󰌶 ", Info = " " }
-        for type, icon in pairs(signs) do
-            local hl = "DiagnosticSign" .. type
-            vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
-        end
     end,
 }

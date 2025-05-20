@@ -1,14 +1,15 @@
 return {
-    "jose-elias-alvarez/null-ls.nvim",
+    "nvimtools/none-ls.nvim",
     event = "VeryLazy",
     config = function()
         local null_ls = require("null-ls")
         null_ls.setup({
             sources = {
                 -- clang-format with style argument (e.g., 'LLVM', 'Google')
-                null_ls.builtins.formatting.clang_format.with({
-                    extra_args = { "--style=Google" },  -- Optional: Change to 'LLVM', 'Chromium', etc.
-                }),
+                null_ls.builtins.formatting.clang_format,
+                -- null_ls.builtins.formatting.clang_format.with({
+                --     extra_args = { "--style=Google" },  -- Optional: Change to 'LLVM', 'Chromium', etc.
+                -- }),
 
                 -- black for Python, with additional arguments
                 null_ls.builtins.formatting.black.with({
