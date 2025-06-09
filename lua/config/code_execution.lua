@@ -165,7 +165,7 @@ local function setup_language(lang_config)
             end
             
             vim.cmd(create_terminal_command(compile_cmd))
-        end, { noremap = true, silent = true })
+        end, { noremap = true, silent = true, buffer = true })
 
         -- Set up execution/run
         vim.keymap.set("n", "<leader>ds", function()
@@ -182,7 +182,7 @@ local function setup_language(lang_config)
             end
             
             vim.cmd(create_terminal_command(execute_cmd))
-        end, { noremap = true, silent = true })
+        end, { noremap = true, silent = true, buffer = true })
     end
 end
 
